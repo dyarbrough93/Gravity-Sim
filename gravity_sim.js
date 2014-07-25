@@ -1,7 +1,7 @@
 var GravitySim = (function(window, undefined) {
 	
 	/**************************************\
-	| Class Variables		               |
+	| Class Variables		                  |
 	\**************************************/
 
 	var frameRate;					  // rendering frame rate
@@ -14,7 +14,7 @@ var GravitySim = (function(window, undefined) {
 	var ctx;						  // the canvas rendering context
 	
 	/**************************************\
-	| Game Logic	                       |
+	| Game Logic	                        |
 	\**************************************/
 
 	/* 
@@ -80,7 +80,7 @@ var GravitySim = (function(window, undefined) {
 	function initSuns(num)
 	{
 		for (var i = 0; i < num; i++) {
-		
+			
 			var newSun = new GravityWell({
 				position: {
 					x: Math.random() * cw,
@@ -88,7 +88,8 @@ var GravitySim = (function(window, undefined) {
 				},
 				density: 1,
 				radius: Math.random() * 50,
-				color: 'red'
+				fillStyle: 'red',
+				useGradient: true
 			});
 
 			suns.push(newSun);
@@ -102,6 +103,7 @@ var GravitySim = (function(window, undefined) {
 	function initSatellites(num)
 	{
 		for (var i = 0; i < num; i++) {
+			
 			var newSat = new GravityWell({
 				position: {
 					x: Math.random() * cw,
@@ -109,7 +111,7 @@ var GravitySim = (function(window, undefined) {
 				},
 				density: 1,
 				radius: Math.random() * 10,
-				color: 'black'
+				fillStyle: 'black'
 			});
 
 			satellites.push(newSat);
@@ -171,7 +173,7 @@ var GravitySim = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Gets/Sets			                   |
+	| Gets/Sets			                     |
 	\**************************************/
 
 	function getScale()
@@ -232,7 +234,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Mouse event handlers 				   |
+	| Mouse event handlers 				      |
 	\**************************************/
 
 	// mouse object
@@ -259,7 +261,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 		var scale = GravitySim.getScale();
 		mouse.x = (e.pageX - canvas.offsetLeft) / scale;
 		mouse.y = (e.pageY - canvas.offsetTop) / scale;
-	};
+	}
 
 	/*
 	 * Mouse down event handler
@@ -279,7 +281,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 			default:
 				throw new UserException("Mouse code not supported.");
 		}
-	};
+	}
 
 	/*
 	 * Mouse up event handler
@@ -299,7 +301,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 			default:
 				throw new UserException("Mouse code not supported.");
 		}
-	};
+	}
 
 	/**************************************\
 	| Key event handlers 				   |
@@ -405,14 +407,15 @@ var KeyMouseEventHandlers = (function(window, undefined) {
  */
 function GravityWell(args) {
 	
-	this.position = args.position || {x: 0, y: 0};
-	this.force    = {x: 0, y: 0};
-	this.velocity = args.velocity || {x: 0, y: 0};
-	this.density  = args.density  || 1;
-	this.radius   = args.radius   || 5;
-	this.mass     = (4 / 3) * Math.PI * this.radius * this.radius * this.radius * this.density;
-	this.color    = args.color    || 'black';
-};
+	this.position    = args.position || {x: 0, y: 0};				// position of the well on the canvas
+	this.force       = {x: 0, y: 0};									   // used for physics calculations
+	this.velocity    = args.velocity || {x: 0, y: 0};			   // velocity of the well
+	this.density     = args.density  || 1;				            // density of the well
+	this.radius      = args.radius   || 5;						    	// radius of the well
+	this.mass        = (4 / 3) * Math.PI * this.radius * this.radius * this.radius * this.density; // mass of the well
+	this.fillStyle   = args.fillStyle   || 'black';			    	// color to use when rendering this well
+	this.useGradient = args.useGradient || false;					// whether or not to use a gradient when rendering this well
+}
 
 GravityWell.prototype = {
 
@@ -445,8 +448,6 @@ GravityWell.prototype = {
 		// calculate x and y acceleration
 		var ax = this.force.x / this.mass,
 		    ay = this.force.y / this.mass;
-
-		//console.log(ax);
 		
 		// calculate x and y velocity
 		var frameRate = GravitySim.getFrameRate();
@@ -468,8 +469,20 @@ GravityWell.prototype = {
 	 */
 	render: function(ctx) {
 
+		var fillStyle = this.color;
+		
+		if (this.useGradient) {
+			
+			// create a gradient for rendering
+			fillStyle = ctx.createRadialGradient(this.position.x, this.position.y, 0, 
+															 this.position.x, this.position.y, this.radius);
+			fillStyle.addColorStop(0, this.fillStyle);
+			fillStyle.addColorStop(1, "white");
+		}
+		
+		// render the well
 		ctx.beginPath();
-		ctx.fillStyle = this.color;
+		ctx.fillStyle = fillStyle;
 		ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.closePath();
