@@ -14,6 +14,7 @@ var GravitySim = (function(window, undefined) {
 	var ctx;						  // the canvas rendering context
 	var gui;								// google gui
 	var settings;					// settings for this sim
+	var scale;							// current scale of the scene
 	
 	/**************************************\
 	| Game Logic	                        |
@@ -247,7 +248,12 @@ var GravitySim = (function(window, undefined) {
 	 */
 	function scaleScene()
 	{
-	
+		var kmeh = "KeyMouseEventHandlers";		// eval(kmeh).isKeyDown() === KeyMouseEventHandlers.isKeyDown()
+		
+		if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.pageUp))
+			scale += settings.zoomSpeed;
+		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.pageDown))
+			scale -= settings.zoomSpeed;
 	}
 	
 	/*
@@ -255,8 +261,11 @@ var GravitySim = (function(window, undefined) {
 	 */
 	function renderScene()
 	{
-		ctx.clearRect(0, 0, cw, ch);
-
+		ctx.save();
+		ctx.translate(cw / 2, ch / 2);
+		ctx.scale(scale, scale);
+		ctx.clearRect((-cw / 2) / scale, (-ch / 2) / scale, cw / scale, ch / scale);
+		
 		suns.forEach(function(sun) {
 			sun.render(ctx);
 		});
@@ -264,6 +273,8 @@ var GravitySim = (function(window, undefined) {
 		satellites.forEach(function(satellite) {
 			satellite.render(ctx);
 		});
+		
+		ctx.restore();
 	}
 
 	/**************************************\
