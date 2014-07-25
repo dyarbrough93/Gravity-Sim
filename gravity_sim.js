@@ -12,6 +12,8 @@ var GravitySim = (function(window, undefined) {
 	var canvas;						  // the canvas to render to
 	var cw, ch;						  // canvas width and height
 	var ctx;						  // the canvas rendering context
+	var gui;								// google gui
+	var settings;					// settings for this sim
 	
 	/**************************************\
 	| Game Logic	                        |
@@ -34,6 +36,8 @@ var GravitySim = (function(window, undefined) {
 		
 		initCanvasCtx();
 		initEventListeners();
+		initSettings();
+		initGUI();
 
 		initSuns(5);
 		initSatellites(30);
@@ -71,6 +75,35 @@ var GravitySim = (function(window, undefined) {
 			cw = canvas.width = window.innerWidth;
 			ch = canvas.height = window.innerHeight;
 		};
+	}
+	
+	/*
+	 * Initialize settings for this sim
+	 */
+	function initSettings()
+	{
+		settings = {
+			zoomSpeed: 0.015,		// how fast the camera zooms in and out
+			panSpeed: 50,			// how fast the camera pans
+			minScale: 0.1,			// minimum zoom of the camera
+			maxScale: 3,			// maximum zoom of the camera
+			gravityStrength: 1,	// strength of gravity
+		};
+	}
+	
+	/*
+	 * Initialize the google GUI
+	 */
+	function initGUI()
+	{
+		gui = new dat.GUI();
+		
+		// add variables we want visible on the GUI
+		gui.add(settings, 'zoomSpeed', 0.01, 0.05);
+		gui.add(settings, 'panSpeed', 15, 100);
+		gui.add(settings, 'minScale', 0.01, 1);
+		gui.add(settings, 'maxScale', 3, 10);
+		gui.add(settings, 'gravityStrength', 1, 50);
 	}
 
 	/*
@@ -175,27 +208,17 @@ var GravitySim = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Getters/Setters			               |
+	| Getters										|
 	\**************************************/
 
 	function getScale()
 	{
 		return scale;
 	}
-
-	function setScale(_scale)
-	{
-		scale = _scale;
-	}
 	
 	function getFrameRate()
 	{	
 		return frameRate;
-	}
-
-	function setFrameRate(_frameRate)
-	{
-		frameRate = _frameRate;
 	}
 	
 	/**************************************/
@@ -204,9 +227,7 @@ var GravitySim = (function(window, undefined) {
 	return {
 		init         : init,
 		getScale     : getScale,
-		setScale     : setScale,
-		getFrameRate : getFrameRate,
-		setFrameRate : setFrameRate
+		getFrameRate : getFrameRate
 	};
 })(window);
 
