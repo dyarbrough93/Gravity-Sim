@@ -453,7 +453,7 @@ GravityWell.prototype = {
 	 */
 	render: function(ctx) {
 
-		var fillStyle = this.color;
+		var fillStyle = this.fillStyle;
 		
 		if (this.useGradient) {
 			
