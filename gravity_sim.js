@@ -133,6 +133,8 @@ var GravitySim = (function(window, undefined) {
 	 */
 	function updateScene()
 	{
+		console.log(KeyMouseEventHandlers.isKeyDown(KeyMouseEventHandlers.keyCode.enter));
+	
 		// determine force to add for each gravity well
 		for (var i = 0; i < suns.length; i++) {
 			for (var j = i + 1; j < suns.length; j++) {
@@ -173,7 +175,7 @@ var GravitySim = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Gets/Sets			                     |
+	| Getters/Setters			               |
 	\**************************************/
 
 	function getScale()
@@ -224,11 +226,11 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 		canvas = _canvas;
 
 		// key event listeners
-		canvas.onkeydown = keyDown;
-		canvas.onkeyup   = keyUp;
+		window.onkeydown = onKeyDown;
+		window.onkeyup   = onKeyUp;
 		
 		// mouse event listeners
-		canvas.onmousemove = getMousePosition;
+		canvas.onmousemove = setMousePosition;
 		canvas.onmousedown = mouseDown;
 		canvas.onmouseup   = mouseUp;
 	}
@@ -240,27 +242,49 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	// mouse object
 	var mouse = {
 		x: 0,
-		y: 0,
-		leftDown: false,
-		rightDown: false,
-		middleDown: false
+		y: 0
 	};
 
 	// mouse code mapping
-	var mouseCodes = {
+	var mouseCode = {
 		left: 1,
 		right: 2,
 		middle: 3
 	};
 
 	/*
-	 * Get the mouse's screen position
+	 * Set the mouse's screen position
 	 */
-	function getMousePosition(e) 
+	function setMousePosition(e) 
 	{
 		var scale = GravitySim.getScale();
 		mouse.x = (e.pageX - canvas.offsetLeft) / scale;
 		mouse.y = (e.pageY - canvas.offsetTop) / scale;
+	}
+	
+	/*
+	 * Get the mouse's screen position
+	 * @return {pair} Mouse screen position
+	 */
+	function getMousePosition()
+	{
+		return {
+			x: mouse.x, 
+			y: mouse.y
+		};
+	}
+	
+	/*
+	 * Is the parameter mouse button down?
+	 * @param {mouseCode} mousecode Mousecode to check
+	 */
+	function isMouseButtonDown(mousecode)
+	{
+		mousecode = "_" + mousecode;
+		if (mouse.hasOwnProperty(mousecode))
+			return mouse[mousecode];
+		else
+			return false;
 	}
 
 	/*
@@ -268,19 +292,8 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	 */
 	function mouseDown(e) 
 	{
-		switch (e.which) {
-			case mouseCodes.left: 
-				mouse.leftDown = true;
-				break;
-			case mouseCodes.right: 
-				mouse.rightDown = true;
-				break;
-			case mouseCodes.middle:
-				mouse.middleDown = true; 
-				break;
-			default:
-				throw new UserException("Mouse code not supported.");
-		}
+		var mousecode = "_" + e.which;
+		mouse[mousecode] = true;
 	}
 
 	/*
@@ -288,36 +301,17 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	 */
 	function mouseUp(e) 
 	{
-		switch (e.which) {
-			case mouseCodes.left: 
-				mouse.leftDown = false;
-				break;
-			case mouseCodes.right: 
-				mouse.rightDown = false;
-				break;
-			case mouseCodes.middle:
-				mouse.middleDown = false; 
-				break;
-			default:
-				throw new UserException("Mouse code not supported.");
-		}
+		var mousecode = "_" + e.which;
+		mouse[mousecode] = false;
 	}
 
 	/**************************************\
-	| Key event handlers 				   |
+	| Key event handlers 				      |
 	\**************************************/
 	
 	// keys object
 	var keys = {
-		upDown: false,
-		downDown: false,
-		leftDown: false,
-		rightDown: false,
-		pageDownDown: false,
-		pageUpDown: false,
-		enterDown: false
 	};
-
 	
 	// key code mapping
 	var keyCode = {
@@ -329,76 +323,45 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 		pageDown: 34,
 		enter: 13
 	};
+	
+	/*
+	 * Is the parameter key down?
+	 * @param {keyCode / int} keycode Key to check
+	 */
+	function isKeyDown(keycode)
+	{
+		keycode = "_" + keycode;
+		if (keys.hasOwnProperty(keycode))
+			return keys[keycode];
+		else
+			return false;
+	}
 
 	/*
 	 * Key down event handler
 	 */
-	function keyDown (e) 
+	function onKeyDown (e) 
 	{
-		switch (e.which) {
-			case keyCode.up:
-				keys.upDown = true;
-				break;
-			case keyCode.down:
-				keys.downDown = true;
-				break;
-			case keyCode.left:
-				keys.leftDown = true;
-				break;
-			case keyCode.right:
-				keys.rightDown = true;
-				break;
-			case keyCode.pageUp:
-				keys.pageUpDown = true;
-				break;
-			case keyCode.pageDown:
-				keys.pageDownDown = true;
-				break;
-			case keyCode.enter:
-				keys.enterDown = true;
-				break;
-			default:
-				throw new UserException("Invalid key code.");
-		}
+		var keycode = "_" + e.which;
+		keys[keycode] = true;
 	}
 
 	/*
 	 * Key up event handler
 	 */
-	function keyUp (e) 
+	function onKeyUp (e) 
 	{
-		switch (e.which) {
-			case keyCode.up:
-				keys.upDown = false;
-				break;
-			case keyCode.down:
-				keys.downDown = false;
-				break;
-			case keyCode.left:
-				keys.leftDown = false;
-				break;
-			case keyCode.right:
-				keys.rightDown = false;
-				break;
-			case keyCode.pageUp:
-				keys.pageUpDown = false;
-				break;
-			case keyCode.pageDown:
-				keys.pageDownDown = false;
-				break;
-			case keyCode.enter:
-				keys.enterDown = false;
-				break;
-			default:
-				throw new UserException("Invalid key code.");
-		}
+		var keycode = "_" + e.which;
+		keys[keycode] = false;
 	}
 
 	// variables we want to be publicly visible
 	return {
-		init  : init,
-		mouse : mouse,
-		keys  : keys
+		init              : init,
+		getMousePosition  : getMousePosition,
+		isMouseButtonDown : isMouseButtonDown,
+		keyCode           : keyCode,
+		isKeyDown         : isKeyDown
 	};
 })(window);
 
