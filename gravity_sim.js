@@ -166,8 +166,16 @@ var GravitySim = (function(window, undefined) {
 	 */
 	function updateScene()
 	{
-		console.log(KeyMouseEventHandlers.isKeyDown(KeyMouseEventHandlers.keyCode.enter));
+		updateWells();
+		panScene();
+		scaleScene();
+	}
 	
+	/*
+	 * Update all gravity wells in the scene
+	 */
+	function updateWells()
+	{
 		// determine force to add for each gravity well
 		for (var i = 0; i < suns.length; i++) {
 			for (var j = i + 1; j < suns.length; j++) {
@@ -189,6 +197,57 @@ var GravitySim = (function(window, undefined) {
 		for (var i = 0; i < satellites.length; i++) {
 			satellites[i].updatePosition();
 		}
+	}
+	
+	/*
+	 * Pan the scene upon user input
+	 */
+	function panScene()
+	{
+		var hdir,	// horizontal direction
+			 vdir;	// vertical direction
+		
+		var kmeh = "KeyMouseEventHandlers";		// eval(kmeh).isKeyDown() === KeyMouseEventHandlers.isKeyDown()
+		
+		// determine if we should pan the scene and in what direction
+		if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.left)) 
+			hdir = 1;
+		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.right))
+			hdir = -1;
+		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.up))
+			vdir = 1;
+		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.down))
+			vdir = -1;
+			
+		// update horizontal position of each well if necessary
+		if (hdir) {
+			suns.forEach(function(sun) {
+				sun.position.x += hdir * settings.panSpeed;
+			});
+			
+			satellites.forEach(function(satellite) {
+				satellite.position.x += hdir * settings.panSpeed;
+			});
+		}
+		
+		// update vertical position of each well if necessary
+		if (vdir) {
+			suns.forEach(function(sun) {
+				sun.position.y += vdir * settings.panSpeed;
+			});
+			
+			satellites.forEach(function(satellite) {
+				satellite.position.y += vdir * settings.panSpeed;
+			});
+		}
+	}
+	
+	/*
+	 * Scale the scene  upon user input
+	 */
+	function scaleScene()
+	{
+	
 	}
 	
 	/*
