@@ -40,8 +40,8 @@ var GravitySim = (function(window, undefined) {
 		initSettings();
 		initGUI();
 
-		initSuns(5);
-		initSatellites(30);
+		initSuns(25);
+		initSatellites(150);
 
 		loop();
 	}
@@ -104,7 +104,7 @@ var GravitySim = (function(window, undefined) {
 		gui.add(settings, 'panSpeed', 15, 100);
 		gui.add(settings, 'minScale', 0.01, 1);
 		gui.add(settings, 'maxScale', 3, 10);
-		gui.add(settings, 'gravityStrength', 1, 50);
+		gui.add(settings, 'gravityStrength', 0, 10);
 	}
 
 	/*
@@ -117,8 +117,8 @@ var GravitySim = (function(window, undefined) {
 			
 			var newSun = new GravityWell({
 				position: {
-					x: Math.random() * cw,
-					y: Math.random() * ch
+					x: (Math.random() * cw) - (cw / 2),
+					y: (Math.random() * ch) - (ch / 2)
 				},
 				density: 1,
 				radius: Math.random() * 50,
@@ -140,11 +140,11 @@ var GravitySim = (function(window, undefined) {
 			
 			var newSat = new GravityWell({
 				position: {
-					x: Math.random() * cw,
-					y: Math.random() * ch
+					x: (Math.random() * cw) - (cw / 2),
+					y: (Math.random() * ch) - (ch / 2)
 				},
 				density: 1,
-				radius: Math.random() * 10,
+				radius: Math.random() * 2.5,
 				fillStyle: 'black'
 			});
 
@@ -177,10 +177,10 @@ var GravitySim = (function(window, undefined) {
 	 */
 	function updateWells()
 	{
-		// determine force to add for each gravity well
+		// determine force to add for each well
 		for (var i = 0; i < suns.length; i++) {
-			for (var j = i + 1; j < suns.length; j++) {
-				suns[i].addForceFrom(suns[j]);
+			for (var j = 0; j < satellites.length; j++) {
+				suns[i].addForceFrom(satellites[j]);
 			}
 		}
 
@@ -264,7 +264,8 @@ var GravitySim = (function(window, undefined) {
 		ctx.save();
 		ctx.translate(cw / 2, ch / 2);
 		ctx.scale(scale, scale);
-		ctx.clearRect((-cw / 2) / scale, (-ch / 2) / scale, cw / scale, ch / scale);
+		ctx.fillStyle = 'rgba(255,255,255,.2)'; 
+		ctx.fillRect((-cw / 2) / scale, (-ch / 2) / scale, cw / scale, ch / scale);
 		
 		suns.forEach(function(sun) {
 			sun.render(ctx);
@@ -290,13 +291,19 @@ var GravitySim = (function(window, undefined) {
 	{	
 		return frameRate;
 	}
+
+	function getGravityStrength()
+	{
+		return settings.gravityStrength;
+	}
 	
 	/**************************************/
 
 	// Module elements we want visible publicly
 	return {
-		init         : init,
-		getScale     : getScale,
+		init : init,
+		getScale : getScale,
+		getGravityStrength : getGravityStrength,
 		getFrameRate : getFrameRate
 	};
 })(window);
@@ -461,14 +468,14 @@ var KeyMouseEventHandlers = (function(window, undefined) {
  */
 function GravityWell(args) {
 	
-	this.position    = args.position || {x: 0, y: 0};				// position of the well on the canvas
-	this.force       = {x: 0, y: 0};									   // used for physics calculations
-	this.velocity    = args.velocity || {x: 0, y: 0};			   // velocity of the well
-	this.density     = args.density  || 1;				            // density of the well
-	this.radius      = args.radius   || 5;						    	// radius of the well
+	this.position    = args.position || {x: 0, y: 0};	// position of the well on the canvas
+	this.force       = {x: 0, y: 0};					// used for physics calculations
+	this.velocity    = args.velocity || {x: 0, y: 0};	// velocity of the well
+	this.density     = args.density  || 1;				// density of the well
+	this.radius      = args.radius   || 5;				// radius of the well
 	this.mass        = (4 / 3) * Math.PI * this.radius * this.radius * this.radius * this.density; // mass of the well
-	this.fillStyle   = args.fillStyle   || 'black';			    	// color to use when rendering this well
-	this.useGradient = args.useGradient || false;					// whether or not to use a gradient when rendering this well
+	this.fillStyle   = args.fillStyle   || 'black';		// color to use when rendering this well
+	this.useGradient = args.useGradient || false;		// whether or not to use a gradient when rendering this well
 }
 
 GravityWell.prototype = {
@@ -488,9 +495,11 @@ GravityWell.prototype = {
 		var cos = xDist / dist;
 		var sin = yDist / dist;
 
+		var G = GravitySim.getGravityStrength();
+
 		// add force based on modified version of universal gravitation
-		this.force.x += -cos * (this.mass * other.mass) / dist;
-		this.force.y += -sin * (this.mass * other.mass) / dist;
+		this.force.x += G * -cos * (this.mass * other.mass) / (dist * dist);
+		this.force.y += G * -sin * (this.mass * other.mass) / (dist * dist);
 	},
 
 	/*
