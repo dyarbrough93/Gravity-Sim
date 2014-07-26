@@ -1,0 +1,32 @@
+html * {
+    margin: 0;
+    padding: 0;
+}
+canvas {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px green;
+}
+#help {
+    font-family: Arial;
+    background-color: #C0F56E;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px green;
+    padding: 4px;
+    border: 1px solid #38DF64;
+    font-size: 14px;
+    margin: 2px auto;
+    width: 325px;
+}
+
+#help p {
+    font-weight: bold;
+}
+
+body {
+    background-color: #00BF32;
+}
+
+img {
+  display: none;
+}
