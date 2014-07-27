@@ -14,7 +14,6 @@ var GravitySim = (function(window, undefined) {
 	var ctx;                // the canvas rendering context
 	var gui;                // google gui
 	var settings;           // settings for this sim
-	var scale;              // current scale of the scene
 	var creatingSun;        // are we currently creating a sun?
 	var newSunPos;          // position of the new sun we are creating
 	
@@ -90,7 +89,7 @@ var GravitySim = (function(window, undefined) {
 			panSpeed: 50,           // how fast the camera pans
 			minScale: 0.1,          // minimum zoom of the camera
 			maxScale: 3,            // maximum zoom of the camera
-			gravityStrength: 0.01,  // strength of gravity
+			gravityStrength: 0.01   // strength of gravity
 		};
 	}
 	
@@ -527,7 +526,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 		init              : init,
 		getMousePosition  : getMousePosition,
 		mouseButtonDown   : mouseButtonDown,
-		mouseCode 		  : mouseCode,
+		mouseCode         : mouseCode,
 		keyCode           : keyCode,
 		keyDown           : keyDown
 	};
@@ -590,7 +589,7 @@ GravityWell.prototype = {
 		// calculate new x and y positions
 		this.position.x += this.velocity.x * frameRate;
 		this.position.y += this.velocity.y * frameRate;
-	  
+
 		// reset forces
 		this.force.x = 0;
 		this.force.y = 0;
@@ -608,7 +607,7 @@ GravityWell.prototype = {
 			
 			// create a gradient for rendering
 			fillStyle = ctx.createRadialGradient(this.position.x, this.position.y, 0, 
-															 this.position.x, this.position.y, this.radius);
+				                                 this.position.x, this.position.y, this.radius);
 			fillStyle.addColorStop(0, this.fillStyle);
 			fillStyle.addColorStop(1, "white");
 		}
@@ -625,13 +624,13 @@ GravityWell.prototype = {
 	 * Retrieve the distance in pixels from another gravity well
 	 * @param {GravityWell} other The gravity well to get the distance from
 	 */
-	 distance: function(other) {
+	distance: function(other) {
 		
 		var xDist = this.position.x - other.position.x;
 		var yDist = this.position.y - other.position.y;
 		
 		return Math.sqrt(xDist * xDist + yDist * yDist);
-	 },
+	},
 };
 
 window.onload = function() {
@@ -646,4 +645,4 @@ window.onload = function() {
 	center.appendChild(canvas);
 
 	GravitySim.init(1 / 60, canvas);
-}
+};
