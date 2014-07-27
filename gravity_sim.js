@@ -1,7 +1,7 @@
 var GravitySim = (function(window, undefined) {
 	
 	/**************************************\
-	| Class Variables		                  |
+	| Class Variables		               |
 	\**************************************/
 
 	var frameRate;					  // rendering frame rate
@@ -15,6 +15,8 @@ var GravitySim = (function(window, undefined) {
 	var gui;								// google gui
 	var settings;					// settings for this sim
 	var scale;							// current scale of the scene
+	var creatingSun;				  // are we currently creating a sun?
+	var newSunPos;					  // position of the new sun we are creating
 	
 	/**************************************\
 	| Game Logic	                        |
@@ -88,7 +90,7 @@ var GravitySim = (function(window, undefined) {
 			panSpeed: 50,			// how fast the camera pans
 			minScale: 0.1,			// minimum zoom of the camera
 			maxScale: 3,			// maximum zoom of the camera
-			gravityStrength: 1,	// strength of gravity
+			gravityStrength: 0.01,	// strength of gravity
 		};
 	}
 	
@@ -104,7 +106,7 @@ var GravitySim = (function(window, undefined) {
 		gui.add(settings, 'panSpeed', 15, 100);
 		gui.add(settings, 'minScale', 0.01, 1);
 		gui.add(settings, 'maxScale', 3, 10);
-		gui.add(settings, 'gravityStrength', 0, 10);
+		gui.add(settings, 'gravityStrength', 0, 0.1);
 	}
 
 	/*
@@ -168,6 +170,8 @@ var GravitySim = (function(window, undefined) {
 	function updateScene()
 	{
 		updateWells();
+		createNewSuns();
+		createNewSatellites();
 		panScene();
 		scaleScene();
 	}
@@ -199,6 +203,65 @@ var GravitySim = (function(window, undefined) {
 			satellites[i].updatePosition();
 		}
 	}
+
+	/*
+	 * Create new suns upon user input
+	 */
+	function createNewSuns()
+	{
+		var eh = "KeyMouseEventHandlers"; // eval(eh).getMousePosition() === KeyMouseEventHandlers.getMousePosition()
+		var mousepos = eval(eh).getMousePosition();
+
+		// get and react to user input
+		if (eval(eh).mouseButtonDown(eval(eh).mouseCode.left)) {
+			if (!creatingSun) {
+				creatingSun = true;
+				newSunPos = eval(eh).getMousePosition();
+			}
+		}
+		else
+			if (creatingSun) {
+				creatingSun = false;
+				var newRadius = Math.sqrt(((newSunPos.x - mousepos.x) * (newSunPos.x - mousepos.x)) + ((newSunPos.y - mousepos.y) * (newSunPos.y - mousepos.y)));
+				suns.push(new GravityWell({
+					position: {
+						x: (newSunPos.x - (cw / 2)) / scale,
+						y: (newSunPos.y - (ch / 2)) / scale
+					},
+					density: 1,
+					radius: newRadius,
+					fillStyle: 'red',
+					useGradient: true
+				}));
+			}
+
+		// render the sun
+		if (creatingSun) {
+			ctx.beginPath();
+			var currRadius = Math.sqrt(((newSunPos.x - mousepos.x) * (newSunPos.x - mousepos.x)) + ((newSunPos.y - mousepos.y) * (newSunPos.y - mousepos.y)));
+			ctx.arc(newSunPos.x, newSunPos.y, currRadius, 0, Math.PI * 2);
+			ctx.fill();
+		}
+	}
+
+	/*
+	 * Create new satellites upon user input
+	 */
+	function createNewSatellites()
+	{
+		var eh = "KeyMouseEventHandlers"; // eval(eh).getMousePosition() = KeyMouseEventHandlers.getMousePosition()
+		var mousepos = eval(eh).getMousePosition();
+		if (eval(eh).mouseButtonDown(eval(eh).mouseCode.right))
+			satellites.push(new GravityWell({
+				position: {
+					x: mousepos.x - (cw / 2),
+					y: mousepos.y - (ch / 2)
+				},
+				density: 1,
+				radius: 2,
+				fillStyle: 'black'
+			}));
+	}
 	
 	/*
 	 * Pan the scene upon user input
@@ -206,18 +269,18 @@ var GravitySim = (function(window, undefined) {
 	function panScene()
 	{
 		var hdir,	// horizontal direction
-			 vdir;	// vertical direction
+			vdir;	// vertical direction
 		
-		var kmeh = "KeyMouseEventHandlers";		// eval(kmeh).isKeyDown() === KeyMouseEventHandlers.isKeyDown()
+		var eh = "KeyMouseEventHandlers";		// eval(eh).isKeyDown() === KeyMouseEventHandlers.isKeyDown()
 		
 		// determine if we should pan the scene and in what direction
-		if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.left)) 
+		if (eval(eh).keyDown(eval(eh).keyCode.left)) 
 			hdir = 1;
-		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.right))
+		else if (eval(eh).keyDown(eval(eh).keyCode.right))
 			hdir = -1;
-		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.up))
+		else if (eval(eh).keyDown(eval(eh).keyCode.up))
 			vdir = 1;
-		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.down))
+		else if (eval(eh).keyDown(eval(eh).keyCode.down))
 			vdir = -1;
 			
 		// update horizontal position of each well if necessary
@@ -248,12 +311,18 @@ var GravitySim = (function(window, undefined) {
 	 */
 	function scaleScene()
 	{
-		var kmeh = "KeyMouseEventHandlers";		// eval(kmeh).isKeyDown() === KeyMouseEventHandlers.isKeyDown()
+		var eh = "KeyMouseEventHandlers";		// eval(eh).isKeyDown() === KeyMouseEventHandlers.isKeyDown()
 		
-		if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.pageUp))
-			scale += settings.zoomSpeed;
-		else if (eval(kmeh).isKeyDown(eval(kmeh).keyCode.pageDown))
-			scale -= settings.zoomSpeed;
+		if (eval(eh).keyDown(eval(eh).keyCode.pageUp))
+			if (scale < settings.maxScale)
+				scale += settings.zoomSpeed * scale;
+			else 
+				scale = settings.maxScale;
+		else if (eval(eh).keyDown(eval(eh).keyCode.pageDown))
+			if (scale > settings.minScale)
+				scale -= settings.zoomSpeed * scale;
+			else 
+				scale = settings.minScale;
 	}
 	
 	/*
@@ -264,7 +333,7 @@ var GravitySim = (function(window, undefined) {
 		ctx.save();
 		ctx.translate(cw / 2, ch / 2);
 		ctx.scale(scale, scale);
-		ctx.fillStyle = 'rgba(255,255,255,.2)'; 
+		ctx.fillStyle = 'rgba(255,255,255,.5)'; 
 		ctx.fillRect((-cw / 2) / scale, (-ch / 2) / scale, cw / scale, ch / scale);
 		
 		suns.forEach(function(sun) {
@@ -346,8 +415,8 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	// mouse code mapping
 	var mouseCode = {
 		left: 1,
-		right: 2,
-		middle: 3
+		middle: 2,
+		right: 3
 	};
 
 	/*
@@ -356,8 +425,8 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	function setMousePosition(e) 
 	{
 		var scale = GravitySim.getScale();
-		mouse.x = (e.pageX - canvas.offsetLeft) / scale;
-		mouse.y = (e.pageY - canvas.offsetTop) / scale;
+		mouse.x = (e.pageX - canvas.offsetLeft);
+		mouse.y = (e.pageY - canvas.offsetTop);
 	}
 	
 	/*
@@ -376,7 +445,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	 * Is the parameter mouse button down?
 	 * @param {mouseCode} mousecode Mousecode to check
 	 */
-	function isMouseButtonDown(mousecode)
+	function mouseButtonDown(mousecode)
 	{
 		mousecode = "_" + mousecode;
 		if (mouse.hasOwnProperty(mousecode))
@@ -426,7 +495,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	 * Is the parameter key down?
 	 * @param {keyCode / int} keycode Key to check
 	 */
-	function isKeyDown(keycode)
+	function keyDown(keycode)
 	{
 		keycode = "_" + keycode;
 		if (keys.hasOwnProperty(keycode))
@@ -457,9 +526,10 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	return {
 		init              : init,
 		getMousePosition  : getMousePosition,
-		isMouseButtonDown : isMouseButtonDown,
+		mouseButtonDown   : mouseButtonDown,
+		mouseCode 		  : mouseCode,
 		keyCode           : keyCode,
-		isKeyDown         : isKeyDown
+		keyDown           : keyDown
 	};
 })(window);
 
@@ -498,8 +568,8 @@ GravityWell.prototype = {
 		var G = GravitySim.getGravityStrength();
 
 		// add force based on modified version of universal gravitation
-		this.force.x += G * -cos * (this.mass * other.mass) / (dist * dist);
-		this.force.y += G * -sin * (this.mass * other.mass) / (dist * dist);
+		this.force.x += G * -cos * (this.mass * other.mass) / (dist);
+		this.force.y += G * -sin * (this.mass * other.mass) / (dist);
 	},
 
 	/*
