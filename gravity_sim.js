@@ -253,8 +253,8 @@ var GravitySim = (function(window, undefined) {
 		if (eval(eh).mouseButtonDown(eval(eh).mouseCode.right))
 			satellites.push(new GravityWell({
 				position: {
-					x: mousepos.x - (cw / 2),
-					y: mousepos.y - (ch / 2)
+					x: (mousepos.x - (cw / 2)) / scale,
+					y: (mousepos.y - (ch / 2)) / scale
 				},
 				density: 1,
 				radius: 2,
