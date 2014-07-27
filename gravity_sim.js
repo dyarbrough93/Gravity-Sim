@@ -1,25 +1,25 @@
 var GravitySim = (function(window, undefined) {
 	
 	/**************************************\
-	| Class Variables		               |
+	| Class Variables                      |
 	\**************************************/
 
-	var frameRate;					  // rendering frame rate
-	var frameLength;				  // length of a frame based on the frame rate
-	var scale;     				      // current scale of the canvas
-	var suns;						  // array of all suns in the scene	
-	var satellites;					  // array of all satellites in the scene
-	var canvas;						  // the canvas to render to
-	var cw, ch;						  // canvas width and height
-	var ctx;						  // the canvas rendering context
-	var gui;								// google gui
-	var settings;					// settings for this sim
-	var scale;							// current scale of the scene
-	var creatingSun;				  // are we currently creating a sun?
-	var newSunPos;					  // position of the new sun we are creating
+	var frameRate;          // rendering frame rate
+	var frameLength;        // length of a frame based on the frame rate
+	var scale;              // current scale of the canvas
+	var suns;               // array of all suns in the scene	
+	var satellites;         // array of all satellites in the scene
+	var canvas;             // the canvas to render to
+	var cw, ch;             // canvas width and height
+	var ctx;                // the canvas rendering context
+	var gui;                // google gui
+	var settings;           // settings for this sim
+	var scale;              // current scale of the scene
+	var creatingSun;        // are we currently creating a sun?
+	var newSunPos;          // position of the new sun we are creating
 	
 	/**************************************\
-	| Game Logic	                        |
+	| Game Logic                           |
 	\**************************************/
 
 	/* 
@@ -86,11 +86,11 @@ var GravitySim = (function(window, undefined) {
 	function initSettings()
 	{
 		settings = {
-			zoomSpeed: 0.015,		// how fast the camera zooms in and out
-			panSpeed: 50,			// how fast the camera pans
-			minScale: 0.1,			// minimum zoom of the camera
-			maxScale: 3,			// maximum zoom of the camera
-			gravityStrength: 0.01,	// strength of gravity
+			zoomSpeed: 0.015,       // how fast the camera zooms in and out
+			panSpeed: 50,           // how fast the camera pans
+			minScale: 0.1,          // minimum zoom of the camera
+			maxScale: 3,            // maximum zoom of the camera
+			gravityStrength: 0.01,  // strength of gravity
 		};
 	}
 	
@@ -348,7 +348,7 @@ var GravitySim = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Getters										|
+	| Getters                              |
 	\**************************************/
 
 	function getScale()
@@ -403,7 +403,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Mouse event handlers 				      |
+	| Mouse event handlers                 |
 	\**************************************/
 
 	// mouse object
@@ -473,7 +473,7 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 	}
 
 	/**************************************\
-	| Key event handlers 				      |
+	| Key event handlers                   |
 	\**************************************/
 	
 	// keys object
@@ -538,14 +538,14 @@ var KeyMouseEventHandlers = (function(window, undefined) {
  */
 function GravityWell(args) {
 	
-	this.position    = args.position || {x: 0, y: 0};	// position of the well on the canvas
-	this.force       = {x: 0, y: 0};					// used for physics calculations
-	this.velocity    = args.velocity || {x: 0, y: 0};	// velocity of the well
-	this.density     = args.density  || 1;				// density of the well
-	this.radius      = args.radius   || 5;				// radius of the well
+	this.position    = args.position || {x: 0, y: 0};   // position of the well on the canvas
+	this.force       = {x: 0, y: 0};                    // used for physics calculations
+	this.velocity    = args.velocity || {x: 0, y: 0};   // velocity of the well
+	this.density     = args.density  || 1;              // density of the well
+	this.radius      = args.radius   || 5;              // radius of the well
 	this.mass        = (4 / 3) * Math.PI * this.radius * this.radius * this.radius * this.density; // mass of the well
-	this.fillStyle   = args.fillStyle   || 'black';		// color to use when rendering this well
-	this.useGradient = args.useGradient || false;		// whether or not to use a gradient when rendering this well
+	this.fillStyle   = args.fillStyle   || 'black';     // color to use when rendering this well
+	this.useGradient = args.useGradient || false;       // whether or not to use a gradient when rendering this well
 }
 
 GravityWell.prototype = {
