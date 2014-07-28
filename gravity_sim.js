@@ -646,7 +646,7 @@ var Misc = (function() {
 	function dist(a, b)
 	{
 		if (!a.hasOwnProperty("x") || !a.hasOwnProperty("y") || !b.hasOwnProperty("x") || !b.hasOwnProperty("y"))
-			throw new UserException("Parameters must be objects with the properties x and y.");
+			throw TypeError("Parameters must be objects with the properties x and y.");
     
 		var x_dist = b.x - a.x;
 		var y_dist = b.y - a.y;
