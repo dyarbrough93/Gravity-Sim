@@ -221,7 +221,7 @@ var GravitySim = (function(window, undefined) {
 		else
 			if (creatingSun) {
 				creatingSun = false;
-				var newRadius = Math.sqrt(((newSunPos.x - mousepos.x) * (newSunPos.x - mousepos.x)) + ((newSunPos.y - mousepos.y) * (newSunPos.y - mousepos.y)));
+				var newRadius = Misc.dist(mousepos, newSunPos);
 				suns.push(new GravityWell({
 					position: {
 						x: (newSunPos.x - (cw / 2)) / scale,
@@ -237,7 +237,7 @@ var GravitySim = (function(window, undefined) {
 		// render the sun
 		if (creatingSun) {
 			ctx.beginPath();
-			var currRadius = Math.sqrt(((newSunPos.x - mousepos.x) * (newSunPos.x - mousepos.x)) + ((newSunPos.y - mousepos.y) * (newSunPos.y - mousepos.y)));
+			var currRadius = Misc.dist(mousepos, newSunPos);
 			ctx.arc(newSunPos.x, newSunPos.y, currRadius, 0, Math.PI * 2);
 			ctx.fill();
 		}
@@ -632,6 +632,33 @@ GravityWell.prototype = {
 		return Math.sqrt(xDist * xDist + yDist * yDist);
 	},
 };
+
+/*
+ * Contains miscellaneous helper functions
+ */
+var Misc = (function() {
+  
+  /*
+   * Computes the distance in pixels between the two parameter points
+   * @param {Pair} a The first point
+   * @param {Pair} b The second point
+   */
+	function dist(a, b)
+	{
+		if (!a.hasOwnProperty("x") || !a.hasOwnProperty("y") || !b.hasOwnProperty("x") || !b.hasOwnProperty("y"))
+			throw new UserException("Parameters must be objects with the properties x and y.");
+    
+		var x_dist = b.x - a.x;
+		var y_dist = b.y - a.y;
+    
+		return Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+	}
+  
+	return {
+		dist : dist
+	};
+  
+})(undefined);
 
 window.onload = function() {
 	
