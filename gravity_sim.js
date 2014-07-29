@@ -553,8 +553,8 @@ GravityWell.prototype = {
 	 * Determine the amount of force another gravity well is exerting on this one
 	 * @param {GravityWell} other The other gravity well
 	 */
-	addForceFrom: function(other) {
-
+	addForceFrom: function(other) 
+	{
 		// distance from other gravity well
 		var xDist  = this.position.x - other.position.x,
 		    yDist  = this.position.y - other.position.y;
@@ -575,8 +575,8 @@ GravityWell.prototype = {
 	 * Update the position of this well based on its current velocity and the 
 	 * force it is experiencing
 	 */
-	updatePosition: function() {
-
+	updatePosition: function() 
+	{
 		// calculate x and y acceleration
 		var ax = this.force.x / this.mass,
 		    ay = this.force.y / this.mass;
@@ -599,8 +599,8 @@ GravityWell.prototype = {
 	 * Draw the gravity well
 	 * @param {CanvasRenderingContext2D} ctx The context to draw to
 	 */
-	render: function(ctx) {
-
+	render: function(ctx) 
+	{
 		var fillStyle = this.fillStyle;
 		
 		if (this.useGradient) {
@@ -624,13 +624,10 @@ GravityWell.prototype = {
 	 * Retrieve the distance in pixels from another gravity well
 	 * @param {GravityWell} other The gravity well to get the distance from
 	 */
-	distance: function(other) {
-		
-		var xDist = this.position.x - other.position.x;
-		var yDist = this.position.y - other.position.y;
-		
-		return Math.sqrt(xDist * xDist + yDist * yDist);
-	},
+	distance: function(other) 
+	{
+		return Misc.dist(this.position, other.position);
+	}
 };
 
 /*
