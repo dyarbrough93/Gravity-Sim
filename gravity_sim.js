@@ -533,7 +533,8 @@ var KeyMouseEventHandlers = (function(window, undefined) {
 })(window);
 
 /*
- * Class representing a gravity well
+ * Represents a gravity well
+ * @constructor
  */
 function GravityWell(args) {
 	
@@ -659,6 +660,7 @@ var Misc = (function() {
 
 window.onload = function() {
 	
+	// set up the canvas
 	var canvas = document.createElement("canvas");
 	var center = document.createElement("center");
 
@@ -668,5 +670,6 @@ window.onload = function() {
 	document.body.appendChild(center);
 	center.appendChild(canvas);
 
+	// initialize the simulation
 	GravitySim.init(1 / 60, canvas);
 };
